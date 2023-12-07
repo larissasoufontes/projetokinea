@@ -42,8 +42,9 @@ def inicio():
                 requisicao = requests.get(link)
                 info = requisicao.json()
                 dado = pd.DataFrame(info['value'])
+                print(dado['dataHoraCotacao'])
                 dado['dataHoraCotacao'] = dado['dataHoraCotacao'].apply(lambda x: x[:-12])
-                x = dado["dataHoraCotacao"]
+                x = dado['dataHoraCotacao']
                 dado['data_final'] = pd.to_datetime(x) - pd.DateOffset(days=30)
                 print(dado)
                 data_i = input("Insira a data final (ex: dd/mm/yyyy):")
@@ -53,13 +54,16 @@ def inicio():
                 info_2 = requisicao_2.json()
                 dado_2 = pd.DataFrame(info_2['value'])
                 dado_2['retorno'] = (dado_2.cotacaoVenda - dado_2.cotacaoVenda.shift(1))/ dado_2.cotacaoVenda.shift(1)
+                print(dado_2)
                 media = np.nanmean(dado_2["retorno"])
                 desvio_pdr = np.nanstd(dado_2['retorno'])
                 Lsp = ((1.96)*desvio_pdr)+media
                 Lin = ((-1.96)*desvio_pdr)+media 
 
-                resposta = ("Se a variação diária do câmbio estiver contido no intervalo %.4f , então a variação não é estatisticamente significativa. Do contrário, pode-se dizer que é estatisticamente diferente de zero." % Lsp)
-                print(resposta)
+                print(dado_2.iloc[len(dado_2)]['retorno'])
+
+                intervalo=np.array([Lsp,Lin])
+                print("Se a variação diária do câmbio estiver contido no intervalo", intervalo,", então a variação não é estatisticamente significativa.")
 
 
 
