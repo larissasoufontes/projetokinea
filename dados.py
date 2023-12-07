@@ -33,7 +33,7 @@ def visualiza_cotacao_por_data(conexao, data):
 def inicio():
     while(seleciona:= input(tela_de_inicio)) != "2":
         if seleciona == "1":
-            data = input("Digite a data de escolha (ex: dd/mm/yyyy):")
+            data = input("Digite a data do dia útil de escolha (ex: 'mm-dd-yyyy'):")
             ponte.execute("SELECT cotacao FROM dolar_valores WHERE data=?", (data,))
             ct_resultado = ponte.fetchall()
             if len(ct_resultado) == 0:
@@ -45,9 +45,9 @@ def inicio():
                 print(dado['dataHoraCotacao'])
                 dado['dataHoraCotacao'] = dado['dataHoraCotacao'].apply(lambda x: x[:-12])
                 x = dado['dataHoraCotacao']
-                dado['data_final'] = pd.to_datetime(x) - pd.DateOffset(days=30)
+                dado['data_de_inicio_da_amostra_estat'] = pd.to_datetime(x) - pd.DateOffset(days=30)
                 print(dado)
-                data_i = input("Insira a data final (ex: dd/mm/yyyy):")
+                data_i = input("Insira a data de inicio da amostra estatística (ex: 'mm-dd-yyyy'):")
                 link_2 = ("https://olinda.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata/CotacaoDolarPeriodo(dataInicial=@dataInicial,dataFinalCotacao=@dataFinalCotacao)?@dataInicial=" 
                          + data_i  + "&@dataFinalCotacao=" + data + "&$top=100&$format=json&$select=cotacaoVenda")
                 requisicao_2 = requests.get(link_2)
@@ -60,10 +60,10 @@ def inicio():
                 Lsp = ((1.96)*desvio_pdr)+media
                 Lin = ((-1.96)*desvio_pdr)+media 
 
-                print(dado_2.iloc[len(dado_2)]['retorno'])
+                print(dado_2.iloc[-1]['retorno'])
 
                 intervalo=np.array([Lsp,Lin])
-                print("Se a variação diária do câmbio estiver contido no intervalo", intervalo,", então a variação não é estatisticamente significativa.")
+                print("Verifique: se a variação diária do câmbio estiver contido no intervalo", intervalo,", então a variação não é estatisticamente significativa.")
 
 
 
